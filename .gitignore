@@ -1,0 +1,5 @@
+/vendor
+.env
+/.reports
+.phpunit.result.cache
+/.scannerwork

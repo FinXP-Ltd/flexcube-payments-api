@@ -1,0 +1,43 @@
+{
+    "name": "finxp/flexcube-payments-api",
+    "version": "1.0.0",
+    "description": "A laravel package for interacting with Banking API.",
+    "require": {
+        "php": "^8.3",
+        "artisaninweb/laravel-soap": "0.3.0.10",
+        "doctrine/dbal": "^4.1.1",
+        "guzzlehttp/guzzle": "^7.9.2",
+        "illuminate/support": "^11.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.4.0",
+        "phpunit/phpunit": "^11.3.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Finxp\\Flexcube\\": "src/",
+            "Finxp\\Flexcube\\Database\\Factories\\": "database/factories/"
+        },
+        "files": []
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Finxp\\Flexcube\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Finxp\\Flexcube\\FlexcubePackageServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
