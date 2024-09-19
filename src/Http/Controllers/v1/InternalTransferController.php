@@ -38,6 +38,9 @@ class InternalTransferController extends Controller
         BankingAPIRepositoryInterface $api
     ) {
         $this->api = $api;
+        $this->date = now()->format('Y-m-d');
+        $this->time = now()->format(self::HOUR_MINUTE);
+        $this->transactionModel = app(config('flexcube-soap.providers.models.transaction'));
     }
 
 
@@ -77,11 +80,9 @@ class InternalTransferController extends Controller
                 'transaction_time' => $this->time,
                 'transaction_payment_url_id' => $request['transaction_payment_url_id'] ?? null,
                 'external_transaction_id' => $request['reference_id'] ?? null,
-                'initiating_party_id' => $this->getInitiatingId($request),
+                'initiating_party_id' => null,
                 'provider' => $request->provider ?? null
             ]);
-            
-            $this->createTransactionLogs($initiateTransaction->id, $request);
 
             $response = $this->callTransferApis($initiateTransaction, $data);
     
@@ -92,7 +93,7 @@ class InternalTransferController extends Controller
 
             $status = $isFailed ? $this->transactionModel::STATUS_FAILED : $this->transactionModel::STATUS_PROCESSING;
 
-            $response_ref_no = $this->getTransactionReferenceNo($response, $isFailed);
+            $response_ref_no = isset($response['data']['data']) ? $response['data']['data'] : null;
 
             $initiateTransaction->update([
                 'status' =>  $status,
@@ -129,20 +130,6 @@ class InternalTransferController extends Controller
             $res,
             __('flexcube::response.transfer.success')
         );
-    }
-
-    public function createTransactionLogs($initiateTransactionId, $request)
-    {
-        FCTransactions::create([
-            'transaction_id' => $initiateTransactionId,
-            'debtor_iban' => $request['sender_iban'] ?? $request['debtor_iban'],
-            'creditor_iban' => $request['recipient_iban'] ?? $request['creditor_iban'],
-            'amount' => $request['amount'],
-            'debit' => $request['amount'],
-            'credit' => '-' . $request['amount'],
-            'currency' => $request['currency'],
-            'remarks' => $request['remarks']
-        ]);
     }
 
     private function callTransferApis($initiateTransaction, $data)
