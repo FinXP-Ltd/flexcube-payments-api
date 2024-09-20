@@ -7,12 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use Finxp\Flexcube\Database\Factories\MerchantAccountFactory;
-use Finxp\Flexcube\Traits\HasAccountLimit;
-use Finxp\Flexcube\Traits\HasUuid;
 
 class MerchantAccount extends Model
 {
-    use HasFactory, HasAccountLimit, HasUuid;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

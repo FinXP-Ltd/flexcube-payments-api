@@ -53,46 +53,12 @@ abstract class TestCase extends OrchestraTestCase
             'transaction' => \Finxp\Flexcube\Tests\Mocks\Models\Transaction::class,
             'merchant' => \Finxp\Flexcube\Tests\Mocks\Models\Merchant::class,
             'api' => \Finxp\Flexcube\Tests\Mocks\Models\ApiAccess::class,
-            'webhook' => \Finxp\Flexcube\Tests\Mocks\Models\Webhook::class,
             'merchant_account' => \Finxp\Flexcube\Tests\Mocks\Models\MerchantAccount::class,
-            'service' => \Finxp\Flexcube\Tests\Mocks\Models\Service::class,
-            'sca' => \Finxp\Flexcube\Tests\Mocks\Models\Token::class,
-            'user' => \Finxp\Flexcube\Tests\Mocks\Models\User::class,
-            'retail_account' => \Finxp\Flexcube\Tests\Mocks\Models\RetailAccount::class,
-            'account_limit_setting' => \Finxp\Flexcube\Tests\Mocks\Models\AccountLimitSetting::class,
-            'account_limit_log' => \Finxp\Flexcube\Tests\Mocks\Models\AccountLimitLog::class
         ]);
 
-        $app['config']->set('flexcube-soap.middleware.role', \Finxp\Flexcube\Tests\Mocks\Middleware\RoleMiddleware::class);
-
-        $app['config']->set('webpush.model', \NotificationChannels\WebPush\PushSubscription::class);
-
-        $app['config']->set('flexcube-soap.providers.services.webhook', \Finxp\Flexcube\Tests\Mocks\Services\WebhookCallService::class);
-
-        $app['config']->set('flexcube-soap.providers.services.freshdesk', \Finxp\Flexcube\Tests\Mocks\Services\Freshdesk\Facade\FreshDesk::class);
-
-        $app['config']->set('flexcube-soap.middleware.routeotp', \Finxp\Flexcube\Tests\Mocks\Middleware\RouteOtp::class);
-
+        
         $app['config']->set('queue.name', 'app');
 
-        $app['config']->set('flexcube-soap.enable_webpush_notification', true);
-
-        $app['config']->set('flexcube-soap.provider.piq_webhook_url', 'https://eoenlmn4xj6rruo.m.pipedream.net');
-
-        $app['config']->set('columnsortable.default_first_column', 'id');
-        
-        $app['config']->set('eloquentfilter.namespace', 'Finxp\\Flexcube\\Tests\\Mocks\\Models\\ModelFilters\\');
-        
-        $app['config']->set('zazoo.webhook_url', 'https://eoenlmn4xj6rruo.m.pipedream.net');
-        
-        $app['config']->set('zazoo.webhook_secret', 'test');
-        
-        $app['config']->set('freshdesk.general.base_url', 'https://eoenlmn4xj6rruo.m.pipedream.net');
-        
-        $app['config']->set('freshdesk.general.api_key', 'test');
-        
-        $app['config']->set('flexcube-soap.payment_notification_url', 'https://eoenlmn4xj6rruo.m.pipedream.net');
-        
         Request::macro(
             'allFilled',
             function (array $keys) {
@@ -109,37 +75,6 @@ abstract class TestCase extends OrchestraTestCase
 
     protected function setUpDatabase($app): void
     {
-        $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('app_uid')->nullable();
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->string('customer_account_number', 20)->nullable();
-            $table->timestamps();
-        });
-
-        $app['db']->connection()->getSchemaBuilder()->create('roles', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('name');
-            $table->timestamps();
-        });
-
-        $app['db']->connection()->getSchemaBuilder()->create('user_has_roles', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('role_id');
-
-            $table->foreign('user_id')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
-
-            $table->foreign('role_id')
-                ->references('id')
-                ->on('roles')
-                ->onDelete('cascade');
-        });
-
         $app['db']
             ->connection()
             ->getSchemaBuilder()
@@ -159,15 +94,6 @@ abstract class TestCase extends OrchestraTestCase
                 $table->boolean('is_iso')->default(false);
                 $table->boolean('skip_computation')->default(false);
                 $table->string('customer_number')->nullable();
-                $table->timestamps();
-            });
-
-        $app['db']
-            ->connection()
-            ->getSchemaBuilder()
-            ->create('services', function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->string('name', 150);
                 $table->timestamps();
             });
 
@@ -209,120 +135,6 @@ abstract class TestCase extends OrchestraTestCase
             });
 
         $app['db']
-            ->connection()
-            ->getSchemaBuilder()
-            ->create('accounts', function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->string('account_number');
-                $table->string('iban');
-                $table->string('description')->nullable();
-                $table->unsignedBigInteger('user_id');
-                $table->timestamps();
-
-                $table->foreign('user_id')
-                    ->references('id')
-                    ->on('users');
-            });
-            
-        $app['db']
-            ->connection()
-            ->getSchemaBuilder()
-            ->create('account_limit_settings', function (Blueprint $table) {
-                $table->id();
-                $table->uuid('uuid')->unique();
-                $table->string('name');
-                $table->double('limit', 8, 2);
-                $table->string('provider')->nullable();
-                $table->timestamps();
-            });
-        
-        $app['db']
-            ->connection()
-            ->getSchemaBuilder()
-            ->create('account_limit_logs', function (Blueprint $table) {
-                $table->id();
-                $table->uuid('uuid')->unique();
-                $table->bigInteger('requestor_id');
-                $table->bigInteger('settings_id')->index('settings_id')->nullable();
-                $table->bigInteger('account_id')->index('account_id')->nullable();
-                $table->bigInteger('account_limit_id')->index('account_limit_id')->nullable();
-                $table->enum('level', ['settings', 'user']);
-                $table->enum('type', ['operations', 'user']);
-                $table->double('old_value', 8, 2)->index('old_value');
-                $table->double('new_value', 8, 2)->index('new_value');
-                $table->timestamps();
-            });
-
-        $app['db']
-            ->connection()
-            ->getSchemaBuilder()
-            ->create('merchant_has_users', function (Blueprint $table) {
-                $table->unsignedBigInteger('merchant_id');
-                $table->unsignedBigInteger('user_id');
-
-                $table->foreign('merchant_id')
-                    ->references('id')
-                    ->on('merchants')
-                    ->onDelete('cascade');
-
-                $table->foreign('user_id')
-                    ->references('id')
-                    ->on('users')
-                    ->onDelete('cascade');
-
-                $table->primary(['merchant_id', 'user_id']);
-            });
-
-        $app['db']
-            ->connection()
-            ->getSchemaBuilder()
-            ->create('push_subscriptions', function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->morphs('subscribable');
-                $table->string('endpoint', 255)->unique();
-                $table->string('public_key')->nullable();
-                $table->string('auth_token')->nullable();
-                $table->string('content_encoding')->nullable();
-                $table->timestamps();
-            });
-
-        $app['db']
-            ->connection()
-            ->getSchemaBuilder()
-            ->create('webhooks', function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->string('url');
-                $table->string('event', 100);
-                $table->text('custom_headers')->nullable();
-                $table->boolean('is_active');
-                $table->unsignedBigInteger('merchant_id')->nullable();
-                $table->timestamps();
-
-                $table->foreign('merchant_id')
-                    ->references('id')
-                    ->on('merchants')
-                    ->onDelete('cascade');
-            });
-
-        $app['db']
-            ->connection()
-            ->getSchemaBuilder()
-            ->create('webhook_logs', function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->unsignedBigInteger('webhook_id');
-                $table->string('url');
-                $table->text('headers')->nullable();
-                $table->longText('payload')->nullable();
-                $table->string('status', 20);
-                $table->timestamps();
-
-                $table->foreign('webhook_id')
-                    ->references('id')
-                    ->on('webhooks')
-                    ->onDelete('cascade');
-            });
-
-        $app['db']
             ->connection(config('database.sandbox'))
             ->getSchemaBuilder()
             ->create('transactions', function (Blueprint $table) {
@@ -355,64 +167,6 @@ abstract class TestCase extends OrchestraTestCase
                 $table->ipAddress('ip_address')->default('0.0.0.0');
                 $table->mediumText('user_agent')->nullable();
                 $table->timestamps();
-            });
-
-        
-            $app['db']
-            ->connection()
-            ->getSchemaBuilder()
-            ->create('otp_tokens', function (Blueprint $table) {
-                $table->uuid('id')->primary();
-                $table->string('identifier');
-                $table->string('code', 6);
-                $table->string('type');
-                $table->boolean('revoked')->default(false);
-                $table->binary('meta')->nullable();
-                $table->timestamp('created_at')->useCurrent();
-                $table->timestamp('updated_at')->useCurrent();
-
-                $table->unique(['identifier', 'code']);
-            });
-
-        $app['db']
-            ->connection()
-            ->getSchemaBuilder()
-            ->create('retail_users', function (Blueprint $table) {
-                $table->uuid('id')->primary();
-                $table->string('app_uid', 10)->nullable();
-                $table->string('email');
-                $table->string('first_name', 100);
-                $table->string('middle_name')->nullable();
-                $table->string('last_name', 100);
-                $table->date('dob')->nullable();
-                $table->string('phone_number');
-                $table->tinyInteger('status')->default(0);
-                $table->string('iban', 50)->nullable();
-                $table->string('bic', 20)->nullable();
-                $table->string('provider')->nullable();
-                $table->text('hash_tokens')->nullable();
-                $table->mediumText('notes')->nullable();
-                $table->timestamps();
-            });
-
-        $app['db']
-            ->connection()
-            ->getSchemaBuilder()
-            ->create('retail_accounts', function (Blueprint $table) {
-                $table->id();
-                $table->uuid('uuid')->unique();
-                $table->unsignedBigInteger('user_id');
-                $table->string('account_number', 100)->nullable();
-                $table->text('description');
-                $table->string('iban', 100)->nullable();
-                $table->string('bic', 50)->default('PAUUMTM1');
-                $table->string('status')->default('pending');
-                $table->boolean('is_active')->default(true);
-                $table->timestamps();
-
-                $table->foreign('user_id')
-                    ->references('id')
-                    ->on('retail_users');
             });
     }
 
@@ -1351,37 +1105,5 @@ abstract class TestCase extends OrchestraTestCase
                     'Content-Type' => 'application/json'
                 ]
             );
-    }
-
-    protected function setAuthApi()
-    {
-        // $this->app['config']->set('auth.defaults.guard', 'api');
-        // $this->app['config']->set('auth.guards.api.driver', 'token');
-    }
-
-    protected function user()
-    {
-        $user = User::create([
-            'email' => 'test@gmail.com', 
-            'password' => 'secret', 
-            'customer_account_number' => '00001'
-        ]);
-
-        $role = Role::create(['name' => 'operations']);
-
-        $user->roles()->sync($role->id);
-
-        return $user;
-    }
-
-    protected function setMerchantProvider()
-    {
-        $this->app['config']->set('app.name', 'FinXP Ltd.');
-    }
-
-    protected function setPiqConfig()
-    {
-        $this->app['config']->set('piq.provider_merchant_id', 1);
-        $this->app['config']->set('piq.merchants', explode(',', '2,3'));
     }
 }

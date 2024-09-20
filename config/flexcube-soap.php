@@ -61,5 +61,7 @@
             'signed_providers' => env('SIGNED_PROVIDERS')
         ],
         
+        'bic' => env('FINXP_BIC', 'PAUUMTM1XXX'),
+        
         'payment_notification_url' => env('PAYMENT_NOTIFICATION_URL'),
     ];

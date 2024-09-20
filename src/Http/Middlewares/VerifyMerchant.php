@@ -58,12 +58,10 @@ class VerifyMerchant
                 ]);
     
             }
-    
-            if($request->has('provider')) {
-                $request->request->set('debtor_iban', $request->sender_iban);
-                $request->request->set('creditor_iban', $request->recipient_iban);
-            }
-    
+
+            $request->request->set('debtor_iban', $request->sender_iban);
+            $request->request->set('creditor_iban', $request->recipient_iban);
+
             return $next($request);
 
         } catch (Exception $e) {
