@@ -32,19 +32,19 @@ class MerchantTransferRequest extends FormRequest
             'account' => 'required|string',
             'amount' => 'required|numeric|min:0.01|decimal:0,2',
             'currency' => 'required|string|size:3|alpha',
+            'sender_name' => self::REQUIRED_STRING,
             'sender_iban' => [
                 'required',
                 'string',
                 new Iban
             ],
-            'sender_name' => self::REQUIRED_STRING,
+            'recipient_name' => self::REQUIRED_STRING,
             'recipient_iban' => [
                 'required',
                 'string',
                 'different:sender_iban',
                 new Iban
             ],
-            'recipient_name' => self::REQUIRED_STRING,
             'reference_id' => self::REQUIRED_STRING,
             'remarks' => 'required|string',
         ];

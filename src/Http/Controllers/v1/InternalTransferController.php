@@ -50,13 +50,17 @@ class InternalTransferController extends Controller
         $isFailed = false;
 
         $data = $request->only([
+            'account',
             'amount',
-            'remarks',
             'currency',
-            'debtor_iban',
+            'sender_iban',
             'sender_name',
-            'creditor_iban',
+            'recipient_iban',
             'recipient_name',
+            'reference_id',
+            'remarks',
+            'debtor_iban',
+            'creditor_iban'
         ]);
 
         try {
@@ -135,16 +139,16 @@ class InternalTransferController extends Controller
     private function callTransferApis($initiateTransaction, $data)
     {
         $type = $initiateTransaction->type;
-        return $type == self::SEPA ? $this->directTransfer($type, $data, $initiateTransaction) : $this->api->internalTransfer( $data );
+        return $type == self::SEPA ? $this->directTransfer($data, $initiateTransaction) : $this->api->internalTransfer( $data );
     }
     
-    private function directTransfer($type, $data, $transaction)
+    private function directTransfer($data, $transaction)
     {
         $payload = [
             'reference_id' => $transaction->uuid,
-            'debtor_iban' => $data['debtor_iban'],
+            'debtor_iban' => $data['sender_iban'] ?? $data['debtor_iban'],
             'debtor_name' => $data['sender_name'] ?? null,
-            'creditor_iban' => $data['creditor_iban'],
+            'creditor_iban' => $data['recipient_iban'] ?? $data['creditor_iban'],
             'creditor_name' => $data['recipient_name'] ?? $transaction->creditor_name,
             'amount' => $data['amount'],
             'currency' => $data['currency'],
@@ -170,8 +174,11 @@ class InternalTransferController extends Controller
     private function validateSEPATransfer($isInternal, $request)
     {
         if (!$isInternal) {
+            $data = [
+                'creditor_name' => $request['recipient_name']
+            ];
 
-            $validator = Validator::make($request, [
+            $validator = Validator::make($data, [
                 'creditor_name' => self::REQUIRED_STRING,
             ]);
     
