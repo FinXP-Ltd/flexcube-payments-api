@@ -29,4 +29,7 @@ interface BankingAPIRepositoryInterface
     public function getDispatchValue( $params = [] );
     
     public function getBicValue( $params = [] );
+    
+    public function getSepaInstEnabled( $params = [] );
+    
 }

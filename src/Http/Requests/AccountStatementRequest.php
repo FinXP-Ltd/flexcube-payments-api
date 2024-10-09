@@ -3,7 +3,6 @@
 namespace Finxp\Flexcube\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class AccountStatementRequest extends FormRequest
 {

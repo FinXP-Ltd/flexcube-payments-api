@@ -3,11 +3,6 @@ namespace Finxp\Flexcube;
 
 use Illuminate\Support\ServiceProvider;
 use Finxp\Flexcube\Http\Middlewares\VerifyMerchant;
-use Finxp\Flexcube\Http\Middlewares\VerifyCustomer;
-use Finxp\Flexcube\Http\Middlewares\VerifyWebhookHeader;
-use Finxp\Flexcube\Providers\EventServiceProvider;
-use Finxp\Flexcube\Providers\RouteServiceProvider;
-use Finxp\Flexcube\Providers\ObserverServiceProvider;
 
 class FlexcubePackageServiceProvider extends ServiceProvider
 {
@@ -16,8 +11,6 @@ class FlexcubePackageServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/flexcube-soap.php', 'flexcube-soap');
 
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
-
-        $this->app->register(RouteServiceProvider::class);
         
         $this->app->bind(
             'Finxp\Flexcube\Repositories\BankingAPI\BankingAPIRepositoryInterface',

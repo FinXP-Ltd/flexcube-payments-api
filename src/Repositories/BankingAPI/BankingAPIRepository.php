@@ -168,4 +168,15 @@ class BankingAPIRepository implements BankingAPIRepositoryInterface
             return [];
         }
     }
+
+    public function getSepaInstEnabled( $params = [] )
+    {
+        try {
+
+            return BankingAPIService::getSepaInstEnabled( $params );
+
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
 }

@@ -44,8 +44,6 @@
             'ECID-Context'    => ''
         ],
 
-        'fc_app' => env('FC_FRONTEND_APP'),
-
         'banking_api'      => [
             'base_url'     => env('BANKING_API_BASE_URL', 'http://10.1.100.6:82/api/v1'),
             'credentials'  => [
@@ -54,11 +52,9 @@
             ]
         ],
 
-        'enable_webpush_notification' => env('ENABLE_WEBPUSH_NOTIF', false),
-
-        'general' => [
-            'secret_key' => env('SIGNED_SECRET_KEY'),
-            'signed_providers' => env('SIGNED_PROVIDERS')
+        'transaction' => [
+            'days_min_limit' => env('TRANSACTION_DAYS_MIN_LIMIT', 30),
+            'days_max_limit' => env('TRANSACTION_DAYS_MAX_LIMIT', 90),
         ],
         
         'bic' => env('FINXP_BIC', 'PAUUMTM1XXX'),

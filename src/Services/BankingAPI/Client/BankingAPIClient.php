@@ -85,6 +85,11 @@ class BankingAPIClient extends AbstractAPI
     {
         return $this->client->request( 'GET', '/accounts/bic-value', $params );
     }
+    
+    public function getSepaInstEnabled( $params = [] )
+    {
+        return $this->client->request( 'GET', '/accounts/sepa-enabled', $params );
+    }
 
     public function getSumOutgoingAmount($params)
     {

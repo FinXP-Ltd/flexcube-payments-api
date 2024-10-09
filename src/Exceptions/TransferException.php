@@ -4,7 +4,7 @@ namespace Finxp\Flexcube\Exceptions;
 
 use Exception;
 
-class InternalTransferException extends Exception
+class TransferException extends Exception
 {
     
 }

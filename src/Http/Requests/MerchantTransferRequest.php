@@ -3,7 +3,6 @@
 namespace Finxp\Flexcube\Http\Requests;
 
 use Finxp\Flexcube\Rules\Iban;
-use Finxp\Flexcube\Traits\CheckProvider;
 
 use Illuminate\Foundation\Http\FormRequest;
 

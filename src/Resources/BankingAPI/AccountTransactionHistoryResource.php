@@ -9,8 +9,6 @@ class AccountTransactionHistoryResource extends JsonResource
     public function toArray($request): array
     {
          return [
-            'transaction_id'        => $this['transaction_id'],
-            'transaction_uuid'      => $this['transaction_uuid'],
             'reference_no'          => $this['reference_no'],
             'service'               => $this['service'],
             'currency'              => 'EUR',

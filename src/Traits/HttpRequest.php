@@ -2,9 +2,6 @@
 
 namespace Finxp\Flexcube\Traits;
 
-use Illuminate\Http\Response;
-use UnexpectedValueException;
-
 trait HttpRequest
 {
     public function httpApiRequest( $method, $request, $url, $payload = array() )

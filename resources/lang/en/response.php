@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'unauthorize' => 'Unauthorize!',
     'account_not_found' => 'Account not found!',
     'no_transactions' => 'No transactions found.',
     'new' => 'Request submitted!',
